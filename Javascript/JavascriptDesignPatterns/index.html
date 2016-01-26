@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Cat Clicker</title>
+		<link rel="stylesheet" href="style/main.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="title">
+				<h1>Cat Clicker!</h1>
+			</div>
+			<nav>
+				<div id="catNames" class="sidebar">
+					<h2>What cats you want to click?</h2>
+					<ul id='catList'>
+						<script id='catElem' type='text/template'>
+							<li>
+								<input type='checkbox' value='{{catImage}}' id='{{catId}}'><label for='{{catId}}'>{{catName}}</label>
+								</input>
+							</li>
+						</script>
+					</ul>
+				</div>
+			</nav>
+			<article>
+				<script id='catDiv' type='text/template'>
+					<div id='div{{catId}}'>
+						<p>Clicks: <label>{{catClicks}}</label></p>
+						<img src='{{catImage}}' alt='Cat Clicker - {{catName}}' title='{{catId}}' id='img{{catId}}'</img>
+					</div>
+				</script>
+			</article>
+			<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+			<script type='text/javascript' src='scripts/main.js'></script>
+		</div>
+	</body>
+
+</html>

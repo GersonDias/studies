@@ -1,0 +1,17 @@
+Aqui vai a maneira mais legal que encontrei de trabalhar com o git no Windows, evitando algumas coisas que não gosto no bash padrão do GIT, quando executado no windows
+
+Você vai precisar:
+
+1)Instalando o git: 
+    a) Baixe o msysGit e instale. Na tela onde ele pede para usar comandos do Unix, marque a terceira opção (substituir alguns comandos do windows pelos respectivos do unix)
+    b) Rode o comando git --version e verifique se a versão do git é a ultima disponivel "git version 1.8.0.msysgit.0"
+
+2) O console do windows (cmd) é uma ferramenta muito ruim para trabalhar. Baixe o Console2 e seja feliz (mostrar como configurar), especialmente a questão do PowerShell
+
+3) Outra ferramenta muito legal para ser usada como linha de comando é o VIM. Baixe e instale normalmente
+
+4) Configure corretamente o arquivo _vimrc e o profile do PowerShell
+
+5) Baixe o repositório do projeto posh-git e rode o install.ps1
+
+6) Divita-se!

@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- This file specifies environment specific values for the publish process -->
+  <PropertyGroup>    
+    <!-- Environment specific properties here -->
+    <MSDeployComputerName Condition=" '$(MSDeployComputerName)'=='' ">http://10.230.20.10/MsDeployAgentService</MSDeployComputerName>
+    <MSDeployUsername Condition=" '$(MSDeployUsername)'=='' ">(local)\gerson.dias</MSDeployUsername>
+    <MSDeployPassword Condition=" '$(MSDeployPassword)'=='' ">Americanas.com</MSDeployPassword>
+    <MSDeployAuth Condition=" '$(MSDeployAuth)'=='' ">Basic</MSDeployAuth>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <MvcApplication1TargetUrl Condition =" '$(MvcApplication1IisPath)'=='' ">http://testeDeploy/testeDeploy</MvcApplication1TargetUrl>
+    <MvcApplication1IisPath Condition=" '$(MvcApplication1IisPath)'=='' ">testeDeploy/testeDeploy</MvcApplication1IisPath>
+    <MvcApplication1TestUrl>10.230.20.10/testeDeploy</MvcApplication1TestUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <MvcApplication2TargetUrl Condition ="'$(MvcApplication2IisPath)'==''">http://testeDeploy/testeDeploy2</MvcApplication2TargetUrl>
+    <MvcApplication2IisPath Condition="'$(MvcApplication2IisPath)'==''">testeDeploy/testeDeploy2</MvcApplication2IisPath>
+    <MvcApplication2TestUrl>10.230.20.10/testeDeploy2</MvcApplication2TestUrl>
+  </PropertyGroup>
+</Project>

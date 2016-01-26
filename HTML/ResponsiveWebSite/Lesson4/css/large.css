@@ -1,0 +1,46 @@
+.siteContainer {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.heroAndTopNewsContainer {
+  width: 100%;
+}
+
+.content {
+  width: 100%;
+  display: flex;
+}
+
+
+.hero {
+  width: 60%;
+}
+
+.hero article {
+  box-sizing: border-box;
+  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  bottom: 0;
+  height: 40%;
+  width: 100%;
+  color: #fff;
+  padding: 1em;
+}
+
+ .news {
+   width: 40%;
+ }
+
+.top-news {
+  height: 300px;
+  border-bottom: 1px solid #E0E0E0;
+  padding: 0em 2em 1em 1em;
+}
+
+.recent-news {
+  width: 100%;
+  padding-right: 2em;
+}

@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchUsersControl", "SearchUsersControl\SearchUsersControl.csproj", "{25C4D6C2-FE4D-43C3-AB9C-486F2C3C6C28}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication1", "WindowsFormsApplication1\WindowsFormsApplication1.csproj", "{21AFA466-705F-4223-BE99-D6D6F9D0F1E6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{25C4D6C2-FE4D-43C3-AB9C-486F2C3C6C28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{25C4D6C2-FE4D-43C3-AB9C-486F2C3C6C28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{25C4D6C2-FE4D-43C3-AB9C-486F2C3C6C28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{25C4D6C2-FE4D-43C3-AB9C-486F2C3C6C28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{21AFA466-705F-4223-BE99-D6D6F9D0F1E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21AFA466-705F-4223-BE99-D6D6F9D0F1E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21AFA466-705F-4223-BE99-D6D6F9D0F1E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21AFA466-705F-4223-BE99-D6D6F9D0F1E6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

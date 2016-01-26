@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="FullPublish" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+  We need to import the environment-specific properties for publishing.
+  When publishing is invoked the property TargetEnvPropsFile needs to be specified.
+  This property identifies the location of the environment-specific project file.
+  -->
+  <Import Project="$(TargetEnvPropsFile)"/>
+ 
+  <!--Vamos configurar algumas coisas importantes...-->
+  <PropertyGroup>
+    <WhatIf Condition="'$(WhatIf)' == ''">false</WhatIf>
+    <BuildingInTeamBuild Condition="'$(TeamFoundationServerUrl)' != ''">true</BuildingInTeamBuild>
+    <Configuration Condition="'$(Configuration)' == ''">Release</Configuration>
+    <SourceRoot Condition="'$(SourceRoot)' == ''">..\</SourceRoot>
+
+    <OutputRoot Condition=" '$(OutputRoot)'=='' ">..\Pacotes\Out\</OutputRoot>
+    <!-- If Team Build is being used then we need to override this value with the built-in OutDir property -->
+    <OutputRoot Condition=" '$(BuildingInTeamBuild)'=='true' ">$(OutDir)</OutputRoot>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- This is where the .deploymanifest file will be written to during a build 
+    <_DbDeployManifestPath>$(OutputRoot)ContactManager.Database.deploymanifest</_DbDeployManifestPath> -->
+    <!-- The folder where the .zip and .cmd file will be located for MvcApplication Web project -->
+    <_MvcApplication1Dest>$(OutputRoot)_PublishedWebsites\MvcApplication1_Package\</_MvcApplication1Dest>
+    <_MvcApplication2Dest>$(OutputRoot)_PublishedWebsites\MvcApplication2_Package\</_MvcApplication2Dest>
+      
+    <!-- The folder where the .zip and .cmd file will be located for ContactManager.Service Web project 
+    <_ContactManagerSvcDest>$(OutputRoot)_PublishedWebsites\ContactManager.Service_Package\</_ContactManagerSvcDest>-->
+
+    <_CmDbScriptPath>$(OutputRoot)Publish-ContactManager-Db.sql</_CmDbScriptPath>
+    <!-- This will go into the web.config -->
+    <_CmFullConnectionString>$(CmDatabaseConnectionString);Initial Catalog=$(CmTargetDatabase)</_CmFullConnectionString>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectsToBuild Include="$(SourceRoot)DeployWebSites.sln" />
+
+  </ItemGroup>
+  
+  
+  <!-- Este é o nome do meu build -->
+  <Target Name="FullPublish" DependsOnTargets="$(FullPublishDependsOn)" />
+  
+  <!-- Quero apagar todos os arquivos existentes antes de fazer o build (clean)
+       mas quero fazer isso somente se não estiver rodando no build do TFS
+  -->
+  <Target Name="Clean" Condition=" '$(BuildingInTeamBuild)' != 'true' ">
+    <Message Text="Limpando o diretório de destino [$(OutputRoot)]" />
+    <ItemGroup>
+      <_FilesToDelete Include="$(OutputRoot)**\*" />
+    </ItemGroup>
+    <Delete Files="@(_FilesToDelete)" />
+    <RemoveDir Directories="$(OutputRoot)" />
+  </Target>
+  
+  <!-- Quero buildar meus projetos/solutions, mas, se estiver no build do tfs, não vamos nos preocupar
+  -->
+  <Target Name="BuildProjects" Condition="'$(BuildInTeamBuild)' != 'true'">
+    <MSBuild Projects="@(ProjectsToBuild)"
+             Properties="OutDir=$(OutputRoot);Configuration=$(Configuration);DeployOnBuild=true;DeployTarget=Package;MSDeployPublishMethod=WMSVC;SkipExtraFilesOnServer"
+             Targets="Rebuild" />
+  </Target>
+  
+  <!--Bora pegar os pacotes para a publicação (os arquivos .cmd e os .dbschema) para publicar-->
+  <Target Name="GatherPackagesForPublishing">
+    <Message Text="Obtendo pacotes para publicação em [$(OutputRoot)]" />
+    <PropertyGroup>
+      <_AdditionalMSDeployParameters>"-allowUntrusted -useCheckSum -xml -enableRule:DoNotDeleteRule"</_AdditionalMSDeployParameters>
+      <_AdditionalMSDeployParameters Condition="'$(includeConfigChanges)' == ''">"-skip:objectName=filePath,absolutePath=.*.config"</_AdditionalMSDeployParameters>
+    </PropertyGroup>
+    <ItemGroup>
+
+      <!--Aqui preciso configurar os parametros para cada projeto web no meu build, afinal queremos deployar o bicho-->
+      <PublishPackages Include="$(_MvcApplication1Dest)MvcApplication1.deploy.cmd">
+        <WebPackage>true</WebPackage>
+        <ParametersXml>$(_MvcApplication1Dest)MvcApplication1.SetParameters.xml</ParametersXml>
+        <AdditionalMSDeployParameters>$(_AdditionalMSDeployParameters)</AdditionalMSDeployParameters>
+        <IisWebAppName>$(MvcApplication1IisPath)</IisWebAppName>
+        <ServiceEndpointParamName>MvcApplication1</ServiceEndpointParamName>
+        <ServiceEndpointValue>$(MvcApplication1TargetUrl)</ServiceEndpointValue>
+        <TestUrl>$(MvcApplication1TestUrl)</TestUrl>
+      </PublishPackages>
+      <PublishPackages Include="$(_MvcApplication2Dest)MvcApplication2.deploy.cmd">
+        <WebPackage>true</WebPackage>
+        <ParametersXml>$(_MvcApplication2Dest)MvcApplication2.SetParameters.xml</ParametersXml>
+        <AdditionalMSDeployParameters>$(_AdditionalMSDeployParameters)</AdditionalMSDeployParameters>
+        <IisWebAppName>$(MvcApplication2IisPath)</IisWebAppName>
+        <ServiceEndpointParamName>MvcApplication2</ServiceEndpointParamName>
+        <ServiceEndpointValue>$(MvcApplication2TargetUrl)</ServiceEndpointValue>
+        <TestUrl>$(MvcApplication2TestUrl)</TestUrl>
+      </PublishPackages>
+    </ItemGroup>
+  </Target>
+ 
+  <!--Só falta publicar agora hein!-->
+  <Target Name="PublishWebPackages" Outputs="%(PublishPackages.Identity)">
+    <!-- Temos que atualizar o SetParameters.xml para ter os parametros corretos-->
+    <Message Text="Fazendo as transformações de XML" />
+    <XmlPoke XmlInputPath="%(PublishPackages.ParametersXml)"
+             Query="//parameters/setParameter[@name='%(PublishPackages.ConnectionName)']/@value"
+             Value='%(PublishPackages.ConnectionString)'
+             Condition =" '%(PublishPackages.ConnectionName)'!=''" />
+    
+    <XmlPoke XmlInputPath="%(PublishPackages.ParametersXml)"
+             Query="//parameters/setParameter[@name='IIS Web Application Name']/@value"
+             Value="%(PublishPackages.IisWebAppName)"
+             Condition =" '%(PublishPackages.IisWebAppName)'!=''" />
+
+    <XmlPoke XmlInputPath="%(PublishPackages.ParametersXml)"
+         Query="//parameters/setParameter[@name='%(PublishPackages.ServiceEndpointParamName)']/@value"
+         Value="%(PublishPackages.ServiceEndpointValue)"
+         Condition =" '%(PublishPackages.ServiceEndpointParamName)'!=''" />
+       
+    <PropertyGroup>
+      <_WhatIfSwitch>/Y</_WhatIfSwitch>
+      <_WhatIfSwitch Condition="'$(WhatIf)' == 'true'">/T</_WhatIfSwitch>
+      <_Cmd>%(PublishPackages.FullPath) $(_WhatIfSwitch) /M:$(MSDeployComputerName) /U:$(MSDeployUserName) /P:$(MSDeployPassword) %(PublishPackages.AdditionalMSDeployParameters)</_Cmd>
+    </PropertyGroup>
+    <Exec Command="$(_Cmd)"/>
+  </Target>
+
+  <Target Name="RunIEForProject" Condition="'$(BuildInTeamBuild)' != 'true'" Outputs="%(PublishPackages.Identity)">
+     <Exec Command="%22%25ProgramFiles%25%5CInternet Explorer%5Ciexplore.exe%22 %(PublishPackages.TestUrl)" IgnoreExitCode="true" Condition="'%(PublishPackages.TestUrl)' != ''" />
+  </Target>
+  
+  <!-- Aqui defino todos os passos que meu processo de build fará-->
+  <PropertyGroup>
+    <FullPublishDependsOn>
+      Clean;
+      BuildProjects;
+      GatherPackagesForPublishing;
+      PublishWebPackages;
+      RunIEForProject;
+    </FullPublishDependsOn>
+  </PropertyGroup>
+</Project>
